@@ -1,0 +1,65 @@
+{
+  "name": "goedemiddag/betterstack-logs",
+  "description": "Monolog handler for Better Stack Logs",
+  "keywords": [
+    "laravel",
+    "monolog",
+    "betterstack"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Johan Krijt",
+      "email": "johan@goedemiddag.nl"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "ext-curl": "*",
+    "monolog/monolog": "^3.0",
+    "illuminate/config": "^10.0",
+    "illuminate/http": "^10.0",
+    "illuminate/support": "^10.0"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^1.9"
+  },
+  "autoload": {
+    "psr-4": {
+      "Goedemiddag\\BetterStackLogs\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Goedemiddag\\BetterStackLogs\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "scripts": {
+    "test": [
+      "@test:analyze",
+      "@test:no-coverage"
+    ],
+    "test:analyze": "vendor/bin/phpstan analyze",
+    "test:coverage": "vendor/bin/phpunit",
+    "test:no-coverage": "vendor/bin/phpunit --no-coverage",
+    "pint:check": "vendor/bin/pint --test",
+    "pint:fix": "vendor/bin/pint",
+    "lint:check": [
+      "@pint:check"
+    ],
+    "lint:fix": [
+      "@pint:fix"
+    ],
+    "all": [
+      "@test",
+      "@lint:fix"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
+}
