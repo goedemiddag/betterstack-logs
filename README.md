@@ -33,8 +33,6 @@ Set the default log channel to `betterstack` or add it to the `stack` channel
 
 Add the following to your `.env` file
 
-```php
-
 
 ```sh
 BETTERSTACK_LOGS_SOURCE_TOKEN=your-source-token
