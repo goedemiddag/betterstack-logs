@@ -7,15 +7,16 @@ use Monolog\Level;
 
 class BetterStackHandler extends BufferHandler
 {
-    public function __construct(
-        string $sourceToken,
-        int|string|Level $level = Level::Debug,
-        bool $bubble = true,
-    ) {
+    public function __construct(string $sourceToken, int|string|Level $level = Level::Debug)
+    {
+        $handler = new SynchronousBetterStackHandler($sourceToken, $level);
+
         parent::__construct(
-            handler: new SynchronousBetterStackHandler($sourceToken, $level, $bubble, BetterStackClient::URL),
+            handler: $handler,
             level  : $level,
-            bubble : $bubble,
         );
+
+        // add synchronous handler processors to buffer handler
+        $this->pushProcessor(fn($record) => $handler->processRecord($record));
     }
 }

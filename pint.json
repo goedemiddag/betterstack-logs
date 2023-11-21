@@ -1,0 +1,43 @@
+{
+  "preset": "laravel",
+  "rules": {
+    "binary_operator_spaces": {
+      "operators": {
+        "=>": "align_single_space_minimal"
+      }
+    },
+    "class_attributes_separation": {
+      "elements": {
+        "const": "only_if_meta"
+      }
+    },
+    "concat_space": {
+      "spacing": "one"
+    },
+    "elseif": false,
+    "function_declaration": {
+      "closure_fn_spacing": "none"
+    },
+    "no_extra_blank_lines": {
+      "tokens": [
+        "throw",
+        "use"
+      ]
+    },
+    "not_operator_with_successor_space": false,
+    "trailing_comma_in_multiline": {
+      "elements": [
+        "arrays",
+        "match",
+        "parameters",
+        "arguments"
+      ]
+    },
+    "type_declaration_spaces": {
+      "elements": [
+        "function"
+      ]
+    },
+    "Laravel/laravel_phpdoc_alignment": false
+  }
+}

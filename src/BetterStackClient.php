@@ -7,16 +7,15 @@ use Monolog\Handler\Curl\Util;
 
 class BetterStackClient
 {
-    const URL = "https://in.logtail.com";
+    const URL = 'https://in.logs.betterstack.com';
 
     public function __construct(
         private readonly string $sourceToken,
-        private readonly string $endpoint = self::URL,
-        private ?CurlHandle $handle = null
+        private ?CurlHandle $handle = null,
     ) {
     }
 
-    public function send($data): void
+    public function send(mixed $data): void
     {
         if (is_null($this->handle)) {
             $this->initCurlHandle();
@@ -37,7 +36,7 @@ class BetterStackClient
             "Authorization: Bearer {$this->sourceToken}",
         ];
 
-        curl_setopt($this->handle, CURLOPT_URL, $this->endpoint);
+        curl_setopt($this->handle, CURLOPT_URL, self::URL);
         curl_setopt($this->handle, CURLOPT_POST, true);
         curl_setopt($this->handle, CURLOPT_HTTPHEADER, $headers);
     }

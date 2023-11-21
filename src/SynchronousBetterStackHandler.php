@@ -2,12 +2,15 @@
 
 namespace Goedemiddag\BetterStackLogs;
 
+use Goedemiddag\BetterStackLogs\Processors\LaravelProcessor;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
 use Monolog\Processor\HostnameProcessor;
+use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\ProcessIdProcessor;
+use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\WebProcessor;
 
 class SynchronousBetterStackHandler extends AbstractProcessingHandler
@@ -17,16 +20,17 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
     public function __construct(
         string $sourceToken,
         int|string|Level $level = Level::Debug,
-        bool $bubble = true,
-        string $endpoint = BetterStackClient::URL
     ) {
-        parent::__construct($level, $bubble);
+        parent::__construct($level);
 
-        $this->client = new BetterStackClient($sourceToken, $endpoint);
+        $this->client = new BetterStackClient($sourceToken);
 
         $this->pushProcessor(new WebProcessor);
+        $this->pushProcessor(new PsrLogMessageProcessor);
         $this->pushProcessor(new ProcessIdProcessor);
         $this->pushProcessor(new HostnameProcessor);
+        $this->pushProcessor(new LaravelProcessor);
+        $this->pushProcessor(new IntrospectionProcessor(skipClassesPartials: ['Illuminate\\', 'Goedemiddag\\BetterStackLogs\\']));
     }
 
     protected function write(LogRecord $record): void
@@ -49,5 +53,10 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
     public function getFormatter(): FormatterInterface
     {
         return $this->getDefaultFormatter();
+    }
+
+    public function processRecord(LogRecord $record): LogRecord
+    {
+        return parent::processRecord($record);
     }
 }

@@ -6,7 +6,7 @@ First of all, thanks for taking the time to contribute 🎉
 
 - Not sure how to implement your contribution? [Open an issue](https://github.com/goedemiddag/laravel-schedule-monitor/issues/new) to discuss it with the community.
 - If you haven't `rebase`d the recent changes in a while, make sure to do so
-  - `git remote add upstream git@github.com:goedemiddag/laravel-schedule-monitor.git`
+  - `git remote add upstream git@github.com:goedemiddag/betterstack-logs.git`
   - `git fetch upstream`
   - `git rebase upstream/main`
   - `git push origin main --force-with-lease`
