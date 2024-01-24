@@ -19,7 +19,7 @@ Add a new channel to the `config/logging.php` file
     ...
     'betterstack' => [
         'driver'         => 'monolog',
-        'level'          => env('LOG_LEVEL', 'debug'),,
+        'level'          => env('LOG_LEVEL', 'debug'),
         'handler'        => \Goedemiddag\BetterStackLogs\BetterStackHandler::class,
         'handler_with'   => [
             'sourceToken' => env('BETTERSTACK_LOGS_SOURCE_TOKEN'),
