@@ -19,6 +19,7 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
 
     public function __construct(
         string $sourceToken,
+        string $appName = null,
         int|string|Level $level = Level::Debug,
     ) {
         parent::__construct($level);
@@ -29,7 +30,7 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
         $this->pushProcessor(new PsrLogMessageProcessor);
         $this->pushProcessor(new ProcessIdProcessor);
         $this->pushProcessor(new HostnameProcessor);
-        $this->pushProcessor(new LaravelProcessor);
+        $this->pushProcessor(new LaravelProcessor($appName));
         $this->pushProcessor(new IntrospectionProcessor(skipClassesPartials: ['Illuminate\\', 'Goedemiddag\\BetterStackLogs\\']));
     }
 

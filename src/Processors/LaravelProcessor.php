@@ -11,9 +11,9 @@ class LaravelProcessor implements ProcessorInterface
     private static mixed $name;
     private static mixed $env;
 
-    public function __construct()
+    public function __construct(string $appName = null)
     {
-        self::$name = Config::get('app.name');
+        self::$name = $appName ?? Config::get('app.name');
         self::$env = Config::get('app.env');
     }
 
