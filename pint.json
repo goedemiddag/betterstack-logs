@@ -38,6 +38,6 @@
         "function"
       ]
     },
-    "Laravel/laravel_phpdoc_alignment": false
+    "phpdoc_align": false
   }
 }
