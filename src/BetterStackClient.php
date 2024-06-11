@@ -17,14 +17,16 @@ class BetterStackClient
 
     public function send(mixed $data): void
     {
-        if (is_null($this->handle)) {
+        if (!$this->handle) {
             $this->initCurlHandle();
         }
 
-        curl_setopt($this->handle, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
+        if ($this->handle instanceof CurlHandle) {
+            curl_setopt($this->handle, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
 
-        Util::execute($this->handle, 5, false);
+            Util::execute($this->handle, 5, false);
+        }
     }
 
     private function initCurlHandle(): void
