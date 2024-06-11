@@ -22,7 +22,7 @@
   },
   "require-dev": {
     "phpstan/phpstan": "^1.9",
-    "laravel/pint": "^1.13"
+    "laravel/pint": "^1.16"
   },
   "autoload": {
     "psr-4": {
