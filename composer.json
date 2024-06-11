@@ -17,12 +17,12 @@
     "php": "^8.2",
     "ext-curl": "*",
     "monolog/monolog": "^3.0",
-    "illuminate/config": "^10.0",
-    "illuminate/support": "^10.0"
+    "illuminate/config": "^10.0|^11.0",
+    "illuminate/support": "^10.0|^11.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^1.9",
-    "laravel/pint": "^1.13"
+    "laravel/pint": "^1.16"
   },
   "autoload": {
     "psr-4": {

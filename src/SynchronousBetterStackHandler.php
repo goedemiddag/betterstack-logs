@@ -19,7 +19,7 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
 
     public function __construct(
         string $sourceToken,
-        string $appName = null,
+        ?string $appName = null,
         int|string|Level $level = Level::Debug,
     ) {
         parent::__construct($level);
