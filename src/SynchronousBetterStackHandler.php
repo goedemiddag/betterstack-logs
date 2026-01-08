@@ -19,12 +19,13 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
 
     public function __construct(
         string $sourceToken,
+        string $endpoint,
         ?string $appName = null,
         int|string|Level $level = Level::Debug,
     ) {
         parent::__construct($level);
 
-        $this->client = new BetterStackClient($sourceToken);
+        $this->client = new BetterStackClient($sourceToken, $endpoint);
 
         $this->pushProcessor(new WebProcessor);
         $this->pushProcessor(new PsrLogMessageProcessor);

@@ -23,6 +23,7 @@ Add a new channel to the `config/logging.php` file
         'handler'        => \Goedemiddag\BetterStackLogs\BetterStackHandler::class,
         'handler_with'   => [
             'sourceToken' => env('BETTERSTACK_LOGS_SOURCE_TOKEN'),
+            'endpoint' => env('BETTERSTACK_ENDPOINT'),
         ],
     ],
     ...
@@ -36,5 +37,6 @@ Add the following to your `.env` file
 
 ```sh
 BETTERSTACK_LOGS_SOURCE_TOKEN=your-source-token
+BETTERSTACK_ENDPOINT=your-endpoint
 ```
 

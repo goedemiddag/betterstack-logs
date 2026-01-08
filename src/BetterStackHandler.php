@@ -7,13 +7,13 @@ use Monolog\Level;
 
 class BetterStackHandler extends BufferHandler
 {
-    public function __construct(string $sourceToken, ?string $appName = null, int|string|Level $level = Level::Debug)
+    public function __construct(string $sourceToken, string $endpoint, ?string $appName = null, int|string|Level $level = Level::Debug)
     {
-        $handler = new SynchronousBetterStackHandler($sourceToken, $appName, $level);
+        $handler = new SynchronousBetterStackHandler($sourceToken, $endpoint, $appName, $level);
 
         parent::__construct(
             handler: $handler,
-            level  : $level,
+            level: $level,
         );
 
         // add synchronous handler processors to buffer handler
