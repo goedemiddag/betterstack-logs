@@ -11,6 +11,7 @@ class BetterStackClient
 
     public function __construct(
         private readonly string $sourceToken,
+        private ?string $host,
         private CurlHandle|false $handle = false,
     ) {
     }
@@ -39,7 +40,7 @@ class BetterStackClient
                 "Authorization: Bearer {$this->sourceToken}",
             ];
 
-            curl_setopt($this->handle, CURLOPT_URL, self::URL);
+            curl_setopt($this->handle, CURLOPT_URL, $this->host ? "https://$this->host" : self::URL);
             curl_setopt($this->handle, CURLOPT_POST, true);
             curl_setopt($this->handle, CURLOPT_HTTPHEADER, $headers);
         }
