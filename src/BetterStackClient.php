@@ -13,8 +13,7 @@ class BetterStackClient
         private readonly string $sourceToken,
         private ?string $host,
         private CurlHandle|false $handle = false,
-    ) {
-    }
+    ) {}
 
     public function send(mixed $data): void
     {
@@ -26,7 +25,7 @@ class BetterStackClient
             curl_setopt($this->handle, CURLOPT_POSTFIELDS, $data);
             curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
 
-            Util::execute($this->handle, 5, false);
+            Util::execute($this->handle);
         }
     }
 

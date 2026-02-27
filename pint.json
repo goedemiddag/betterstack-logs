@@ -25,6 +25,7 @@
       ]
     },
     "not_operator_with_successor_space": false,
+    "nullable_type_declaration_for_default_null_value": true,
     "trailing_comma_in_multiline": {
       "elements": [
         "arrays",

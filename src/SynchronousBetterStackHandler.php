@@ -2,16 +2,15 @@
 
 namespace Goedemiddag\BetterStackLogs;
 
-use Goedemiddag\BetterStackLogs\Processors\LaravelProcessor;
+use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
+use InvalidArgumentException;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
-use Monolog\Processor\HostnameProcessor;
-use Monolog\Processor\IntrospectionProcessor;
-use Monolog\Processor\ProcessIdProcessor;
-use Monolog\Processor\PsrLogMessageProcessor;
-use Monolog\Processor\WebProcessor;
 
 class SynchronousBetterStackHandler extends AbstractProcessingHandler
 {
@@ -20,19 +19,28 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
     public function __construct(
         string $sourceToken,
         ?string $host,
-        ?string $appName,
         int|string|Level $level = Level::Debug,
     ) {
         parent::__construct($level);
 
         $this->client = new BetterStackClient($sourceToken, $host);
 
-        $this->pushProcessor(new WebProcessor);
-        $this->pushProcessor(new PsrLogMessageProcessor);
-        $this->pushProcessor(new ProcessIdProcessor);
-        $this->pushProcessor(new HostnameProcessor);
-        $this->pushProcessor(new LaravelProcessor($appName));
-        $this->pushProcessor(new IntrospectionProcessor(skipClassesPartials: ['Illuminate\\', 'Goedemiddag\\BetterStackLogs\\']));
+        /** @var array<callable> $processors */
+        $processors = (new Collection(Arr::wrap(Config::get('logging.channels.betterstack.processors'))))
+            ->map(function ($processor) {
+                if (is_string($processor)) {
+                    return Container::getInstance()->make($processor);
+                }
+
+                if (is_array($processor) && is_string($processor['processor'] ?? null)) {
+                    return Container::getInstance()->make($processor['processor'], Arr::wrap($processor['with'] ?? []));
+                }
+
+                throw new InvalidArgumentException('Invalid processor definition for BetterStack handler.');
+            })
+            ->toArray();
+
+        $this->processors = $processors;
     }
 
     protected function write(LogRecord $record): void
@@ -49,7 +57,7 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
 
     protected function getDefaultFormatter(): FormatterInterface
     {
-        return new BetterStackFormatter();
+        return new BetterStackFormatter;
     }
 
     public function getFormatter(): FormatterInterface
