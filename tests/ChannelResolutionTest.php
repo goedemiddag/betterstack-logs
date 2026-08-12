@@ -2,8 +2,10 @@
 
 namespace Goedemiddag\BetterStackLogs\Tests;
 
+use Goedemiddag\BetterStackLogs\BetterStackClient;
 use Goedemiddag\BetterStackLogs\BetterStackHandler;
 use Goedemiddag\BetterStackLogs\Tests\Concerns\CapturesErrorLog;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
@@ -79,6 +81,14 @@ class ChannelResolutionTest extends TestCase
             $this->capturedErrorLog(),
             'The default configuration must still ship logs; only the attempt failing is expected here.',
         );
+    }
+
+    #[Test]
+    public function the_container_cannot_build_a_client_of_its_own(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $this->app->make(BetterStackClient::class);
     }
 
     #[Test]
