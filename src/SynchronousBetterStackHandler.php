@@ -11,19 +11,39 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
+use Throwable;
 
 class SynchronousBetterStackHandler extends AbstractProcessingHandler
 {
     private BetterStackClient $client;
 
+    private bool $active;
+
     public function __construct(
-        string $sourceToken,
-        ?string $host,
+        ?string $sourceToken = null,
+        ?string $host = null,
         int|string|Level $level = Level::Debug,
+        ?bool $enabled = null,
+        ?BetterStackClient $client = null,
+        ?int $connectTimeout = null,
+        ?int $timeout = null,
+        ?int $retries = null,
     ) {
         parent::__construct($level);
 
-        $this->client = new BetterStackClient($sourceToken, $host);
+        $this->active = self::resolveEnabled($enabled) && trim((string) $sourceToken) !== '';
+
+        $this->client = $client ?? new BetterStackClient(
+            sourceToken   : $sourceToken,
+            host          : $host,
+            connectTimeout: $connectTimeout,
+            timeout       : $timeout,
+            retries       : $retries,
+        );
+
+        if (!$this->active) {
+            return;
+        }
 
         /** @var array<callable> $processors */
         $processors = (new Collection(Arr::wrap(Config::get('logging.channels.betterstack.processors'))))
@@ -43,16 +63,53 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
         $this->processors = $processors;
     }
 
+    private static function resolveEnabled(?bool $enabled): bool
+    {
+        if ($enabled !== null) {
+            return $enabled;
+        }
+
+        $configured = Config::get('logging.channels.betterstack.enabled');
+
+        return (bool) ($configured ?? true);
+    }
+
+    public function isHandling(LogRecord $record): bool
+    {
+        if (!$this->active) {
+            return false;
+        }
+
+        return parent::isHandling($record);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
     protected function write(LogRecord $record): void
     {
-        $this->client->send($record->formatted);
+        try {
+            $this->client->send($record->formatted);
+        } catch (Throwable $e) {
+            $this->reportFailure($e);
+        }
     }
 
     public function handleBatch(array $records): void
     {
-        $formattedRecords = $this->getFormatter()->formatBatch($records);
+        if (!$this->active) {
+            return;
+        }
 
-        $this->client->send($formattedRecords);
+        try {
+            $formattedRecords = $this->getFormatter()->formatBatch($records);
+
+            $this->client->send($formattedRecords);
+        } catch (Throwable $e) {
+            $this->reportFailure($e);
+        }
     }
 
     protected function getDefaultFormatter(): FormatterInterface
@@ -68,5 +125,10 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
     public function processRecord(LogRecord $record): LogRecord
     {
         return parent::processRecord($record);
+    }
+
+    private function reportFailure(Throwable $e): void
+    {
+        error_log('[betterstack-logs] failed to deliver logs: ' . $e->getMessage());
     }
 }
