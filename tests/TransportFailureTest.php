@@ -99,7 +99,7 @@ class TransportFailureTest extends TestCase
     #[Test]
     public function the_client_makes_no_request_at_all_when_the_source_token_is_blank(): void
     {
-        $client = new BetterStackClient(null, self::DEAD_HOST);
+        $client = new BetterStackClient('', self::DEAD_HOST);
 
         $client->send('{"message":"hello"}');
 

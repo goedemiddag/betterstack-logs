@@ -34,7 +34,7 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
         $this->active = self::resolveEnabled($enabled) && trim((string) $sourceToken) !== '';
 
         $this->client = $client ?? new BetterStackClient(
-            sourceToken   : $sourceToken,
+            sourceToken   : (string) $sourceToken,
             host          : $host,
             connectTimeout: $connectTimeout,
             timeout       : $timeout,

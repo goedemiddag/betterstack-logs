@@ -14,7 +14,7 @@ class BetterStackClient
     private const DEFAULT_RETRIES = 2;
 
     public function __construct(
-        private readonly ?string $sourceToken,
+        private readonly string $sourceToken,
         private readonly ?string $host,
         private CurlHandle|false $handle = false,
         private readonly ?int $connectTimeout = null,
@@ -57,7 +57,7 @@ class BetterStackClient
 
     private function hasSourceToken(): bool
     {
-        return trim((string) $this->sourceToken) !== '';
+        return trim($this->sourceToken) !== '';
     }
 
     private function initCurlHandle(): void
