@@ -1,0 +1,128 @@
+name: Tests
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    php-tests:
+        name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
+
+        runs-on: ubuntu-latest
+
+        timeout-minutes: 5
+
+        strategy:
+            fail-fast: false
+            matrix:
+                php: [8.2, 8.3, 8.4, 8.5]
+                laravel: [^10.0, ^11.0, ^12.0, ^13.0]
+                stability: [prefer-stable]
+                include:
+                    - laravel: ^10.0
+                      testbench: ^8.0
+                    - laravel: ^11.0
+                      testbench: ^9.1.14
+                    - laravel: ^12.0
+                      testbench: ^10.0
+                    - laravel: ^13.0
+                      testbench: ^11.0
+                    - php: 8.2
+                      laravel: ^10.0
+                      testbench: ^8.0
+                      stability: prefer-lowest
+                    - php: 8.2
+                      laravel: ^11.0
+                      testbench: ^9.1.14
+                      stability: prefer-lowest
+                    - php: 8.2
+                      laravel: ^12.0
+                      testbench: ^10.0
+                      stability: prefer-lowest
+                    - php: 8.3
+                      laravel: ^13.0
+                      testbench: ^11.0
+                      stability: prefer-lowest
+                exclude:
+                    - php: 8.2
+                      laravel: ^13.0
+                    - php: 8.5
+                      laravel: ^10.0
+                    - php: 8.5
+                      laravel: ^11.0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: ${{ matrix.php }}
+                extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
+                coverage: none
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache composer dependencies
+              uses: actions/cache@v5
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-php${{ matrix.php }}-laravel${{ matrix.laravel }}-${{ matrix.stability }}-${{ hashFiles('composer.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-php${{ matrix.php }}-laravel${{ matrix.laravel }}-${{ matrix.stability }}-
+                      ${{ runner.os }}-composer-php${{ matrix.php }}-laravel${{ matrix.laravel }}-
+
+            - name: Install dependencies
+              run: |
+                  composer require --dev "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+                  composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+
+            - name: Execute tests
+              run: |
+                  vendor/bin/phpunit
+
+    static-analysis:
+        name: Static analysis
+
+        runs-on: ubuntu-latest
+
+        timeout-minutes: 5
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: 8.3
+                extensions: curl, mbstring, zip
+                coverage: none
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache composer dependencies
+              uses: actions/cache@v5
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-static-analysis-${{ hashFiles('composer.json') }}
+                  restore-keys: ${{ runner.os }}-composer-static-analysis-
+
+            - name: Install dependencies
+              run: composer update --prefer-dist --no-interaction
+
+            - name: Check code style
+              run: composer pint:check
+
+            - name: Run static analysis
+              run: composer test:analyze
