@@ -9,9 +9,9 @@ use Throwable;
 class BetterStackClient
 {
     private const URL = 'https://in.logs.betterstack.com';
-    private const DEFAULT_CONNECT_TIMEOUT = 2;
-    private const DEFAULT_TIMEOUT = 5;
-    private const DEFAULT_RETRIES = 2;
+    public const DEFAULT_CONNECT_TIMEOUT = 2;
+    public const DEFAULT_TIMEOUT = 5;
+    public const DEFAULT_RETRIES = 2;
 
     public function __construct(
         private readonly string $sourceToken,

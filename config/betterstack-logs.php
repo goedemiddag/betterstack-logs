@@ -1,5 +1,6 @@
 <?php
 
+use Goedemiddag\BetterStackLogs\BetterStackClient;
 use Goedemiddag\BetterStackLogs\BetterStackHandler;
 use Goedemiddag\BetterStackLogs\Processors\LaravelProcessor;
 use Monolog\Processor\HostnameProcessor;
@@ -19,9 +20,9 @@ return [
         'sourceToken' => env('BETTERSTACK_LOGS_SOURCE_TOKEN'),
         'host'        => env('BETTERSTACK_LOGS_HOST'),
 
-        'connectTimeout' => (int) env('BETTERSTACK_LOGS_CONNECT_TIMEOUT', 0),
-        'timeout'        => (int) env('BETTERSTACK_LOGS_TIMEOUT', 0),
-        'retries'        => (int) env('BETTERSTACK_LOGS_RETRIES', 0),
+        'connectTimeout' => (int) env('BETTERSTACK_LOGS_CONNECT_TIMEOUT', BetterStackClient::DEFAULT_CONNECT_TIMEOUT),
+        'timeout'        => (int) env('BETTERSTACK_LOGS_TIMEOUT', BetterStackClient::DEFAULT_TIMEOUT),
+        'retries'        => (int) env('BETTERSTACK_LOGS_RETRIES', BetterStackClient::DEFAULT_RETRIES),
     ],
 
     'processors' => [
