@@ -5,9 +5,12 @@ on:
         branches: [master]
     pull_request:
 
+permissions:
+    contents: read
+
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
     php-tests:
@@ -51,6 +54,8 @@ jobs:
                 exclude:
                     - php: 8.2
                       laravel: ^13.0
+                    - php: 8.4
+                      laravel: ^10.0
                     - php: 8.5
                       laravel: ^10.0
                     - php: 8.5
@@ -64,7 +69,7 @@ jobs:
               uses: shivammathur/setup-php@v2
               with:
                 php-version: ${{ matrix.php }}
-                extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
+                extensions: curl, mbstring, zip
                 coverage: none
 
             - name: Get composer cache directory
@@ -83,14 +88,59 @@ jobs:
             - name: Install dependencies
               run: |
                   composer require --dev "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-                  composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+                  composer update --${{ matrix.stability }} ${{ matrix.stability == 'prefer-lowest' && '--prefer-stable' || '' }} --prefer-dist --no-interaction
 
             - name: Execute tests
-              run: |
-                  vendor/bin/phpunit
+              run: composer test:no-coverage
 
     static-analysis:
-        name: Static analysis
+        name: Static analysis - Laravel ${{ matrix.laravel }}
+
+        runs-on: ubuntu-latest
+
+        timeout-minutes: 5
+
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - laravel: ^10.0
+                      testbench: ^8.0
+                    - laravel: ^13.0
+                      testbench: ^11.0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: 8.3
+                extensions: curl, mbstring, zip
+                coverage: none
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache composer dependencies
+              uses: actions/cache@v5
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-static-analysis-laravel${{ matrix.laravel }}-${{ hashFiles('composer.json') }}
+                  restore-keys: ${{ runner.os }}-composer-static-analysis-laravel${{ matrix.laravel }}-
+
+            - name: Install dependencies
+              run: |
+                  composer require --dev "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+                  composer update --prefer-dist --no-interaction
+
+            - name: Run static analysis
+              run: composer test:analyze
+
+    code-style:
+        name: Code style
 
         runs-on: ubuntu-latest
 
@@ -115,14 +165,11 @@ jobs:
               uses: actions/cache@v5
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
-                  key: ${{ runner.os }}-composer-static-analysis-${{ hashFiles('composer.json') }}
-                  restore-keys: ${{ runner.os }}-composer-static-analysis-
+                  key: ${{ runner.os }}-composer-code-style-${{ hashFiles('composer.json') }}
+                  restore-keys: ${{ runner.os }}-composer-code-style-
 
             - name: Install dependencies
               run: composer update --prefer-dist --no-interaction
 
             - name: Check code style
               run: composer pint:check
-
-            - name: Run static analysis
-              run: composer test:analyze
