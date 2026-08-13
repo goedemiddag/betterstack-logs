@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
@@ -90,6 +89,10 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
 
     protected function write(LogRecord $record): void
     {
+        if (!is_string($record->formatted)) {
+            return;
+        }
+
         try {
             $this->client->send($record->formatted);
         } catch (Throwable $e) {
@@ -112,12 +115,12 @@ class SynchronousBetterStackHandler extends AbstractProcessingHandler
         }
     }
 
-    protected function getDefaultFormatter(): FormatterInterface
+    protected function getDefaultFormatter(): BetterStackFormatter
     {
         return new BetterStackFormatter;
     }
 
-    public function getFormatter(): FormatterInterface
+    public function getFormatter(): BetterStackFormatter
     {
         return $this->getDefaultFormatter();
     }

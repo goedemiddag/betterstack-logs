@@ -134,7 +134,7 @@ class BetterStackHandlerTest extends TestCase
         $handler->close();
 
         $this->assertCount(1, $client->sent);
-        $this->assertStringContainsString('hello betterstack', (string) $client->sent[0]);
+        $this->assertStringContainsString('hello betterstack', $client->sent[0]);
     }
 
     #[Test]

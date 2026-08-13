@@ -14,7 +14,7 @@ class ThrowingClient extends BetterStackClient
         parent::__construct('throwing-token', null);
     }
 
-    public function send(mixed $data): void
+    public function send(string $data): void
     {
         $this->attempts++;
 

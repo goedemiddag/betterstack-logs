@@ -6,7 +6,7 @@ use Goedemiddag\BetterStackLogs\BetterStackClient;
 
 class RecordingClient extends BetterStackClient
 {
-    /** @var array<int, mixed> */
+    /** @var array<int, string> */
     public array $sent = [];
 
     public function __construct()
@@ -14,7 +14,7 @@ class RecordingClient extends BetterStackClient
         parent::__construct('recording-token', null);
     }
 
-    public function send(mixed $data): void
+    public function send(string $data): void
     {
         $this->sent[] = $data;
     }

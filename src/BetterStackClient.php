@@ -22,7 +22,7 @@ class BetterStackClient
         private readonly ?int $retries = null,
     ) {}
 
-    public function send(mixed $data): void
+    public function send(string $data): void
     {
         if (!$this->hasSourceToken()) {
             return;
