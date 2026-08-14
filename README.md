@@ -18,25 +18,24 @@ Add a new channel to the `config/logging.php` file
 'channels' => [
     ...
     'betterstack' => [
-        'driver'         => 'monolog',
-        'level'          => env('LOG_LEVEL', 'debug'),
-        'handler'        => \Goedemiddag\BetterStackLogs\BetterStackHandler::class,
-        'handler_with'   => [
+        'driver'       => 'monolog',
+        'level'        => env('LOG_LEVEL', 'debug'),
+        'enabled'      => env('BETTERSTACK_LOGS_ENABLED', true),
+        'handler'      => \Goedemiddag\BetterStackLogs\BetterStackHandler::class,
+        'handler_with' => [
             'sourceToken' => env('BETTERSTACK_LOGS_SOURCE_TOKEN'),
             'host'        => env('BETTERSTACK_LOGS_HOST'),
         ],
     ],
     ...
-]   
+]
 ```
 
-Set the default log channel to `betterstack` or add it to the `stack` channel
+Set the default log channel to `betterstack` or add it to the `stack` channel.
 
-Add the following to your `.env` file
-
+Add the following to your `.env` file:
 
 ```sh
 BETTERSTACK_LOGS_SOURCE_TOKEN=your-source-token
 BETTERSTACK_LOGS_HOST=your-ingestion-host
 ```
-
