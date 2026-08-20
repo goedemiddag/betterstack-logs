@@ -1,3 +1,5 @@
+[![Laravel Compatibility](https://badge.laravel.cloud/badge/goedemiddag/betterstack-logs)](https://packagist.org/packages/goedemiddag/betterstack-logs)
+
 # Monolog handler for Better Stack Logs
 
 This package allows you to write logs to Better Stack Logs.
